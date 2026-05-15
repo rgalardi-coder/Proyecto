@@ -77,7 +77,22 @@ def informe_personal_planta(planta):
     total=cursor.fetchone()[0]
     print(f"En la planta: {planta} trabajan: {total} personas.")
     conn.close()
+def listar_personal():
+    conn=conectamos_bd()
+    cursor=conn.cursor()
+    cursor.execute("Select nombre, tipo, planta FROM personal ORDER BY planta ASC")
+    usuarios=cursor.fetchall()
     
+    if not usuarios:
+        print("No hay personal registrado...")
+    else:
+        print("Lista de personal: ")  
+        print(f"{'Nombre': <15} |{'Tipo':<12} | {'Planta':<6}")
+        print("-" * 40) 
+        for u in usuarios:
+            print(f"{u[0]:<15} | {u[1]:<12} | {u[2]:<6}")
+    conn.close() 
+
 #Anexo 5. Exportacion XML
 def exportar_visitas_xml(fecha_inici, fecha_fin):
     conn=conectamos_bd()
@@ -93,6 +108,7 @@ def exportar_visitas_xml(fecha_inici, fecha_fin):
         ET.SubElement(v_element, "Paciente").text=v[2]
         ET.SubElement(v_element, "DNI").text=v[3]
         ET.SubElement(v_element, "Medico").text=v[4]
+        ET.SubElement(v_element, "Diagnostico").text=v[5]
         
     #Guardar identado
     tree=ET.ElementTree(root)
@@ -104,15 +120,15 @@ def exportar_visitas_xml(fecha_inici, fecha_fin):
 def menu():
    inicializamos_tablas()
    #simulacion del primer inicio para crear el archivo login
-   guardar_log("adm","Passw0rd")
+   guardar_log("Rebeca","Passw0rd")
    print("Hospital")
    usuario=input("Usuario: ")
    password=input("Password: ")
    if verif_log(usuario, password):
       opcion=" "
       #bucle principal
-      while opcion != "4":
-        print("\n1.Alta personal\n2.Informe Planta\n3.Exportar\n4.Salir.")
+      while opcion != "5":
+        print("\n1.Alta personal\n2.Informe Planta\n3.Exportar\n4.Lista\n5.Salimos.")
         opcion=input("Seleccione: ")
         
         if opcion =="1":
@@ -128,10 +144,14 @@ def menu():
            f2= input("Fecha fin(YYYY-MM-DD): ")
            exportar_visitas_xml(f1, f2)
            print("Archivo 'exportacion_visitas.xml' generado")
+         elif opcion == "4":
+            listar_personal()
+        elif opcion == "5":
+            print("Salimos del programa.")
 #Probamos si funciona
 if __name__=="__main__":
    inicializamos_tablas()
-   guardar_log("adm", "Passw0rd")
+   guardar_log("Rebeca", "Passw0rd")
    print("Base de datos y login configurados.")
    menu()
     
